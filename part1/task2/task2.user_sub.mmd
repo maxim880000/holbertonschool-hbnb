@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User
+    participant "API Service Layer"
+    participant "Business Facade"
+    participant "Business Logic Layer"
+    participant "Database Layer"
+
+    User->>"API Service Layer": Submit registration form (name, email, password)
+    "API Service Layer"->>"Business Facade": registerUser(data)
+    "Business Facade"->>"Business Logic Layer": Validate input and check business rules
+    "Business Logic Layer"->>"Database Layer": Check if email already exists
+    "Database Layer"-->>"Business Logic Layer": Email available / Email exists
+    "Business Logic Layer"->>"Database Layer": Create new user (UUID, createdAt, updatedAt)
+    "Database Layer"-->>"Business Logic Layer": Confirmation of user creation
+    "Business Logic Layer"-->>"Business Facade": Return success or error
+    "Business Facade"-->>"API Service Layer": Return final result
+    "API Service Layer"-->>User: Display confirmation or error

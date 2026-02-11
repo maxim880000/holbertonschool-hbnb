@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant User
+    participant API as API/Service Layer
+    participant Facade as Business Facade
+    participant BL as Business Logic Layer
+    participant DB as Database Layer
+
+    User->>API: Submit new place form (title, description, price, location, amenities)
+    API->>Facade: createPlace(data, userId)
+    Facade->>BL: Validate input and check ownership rules
+    BL->>DB: Insert new place with details and owner reference
+    DB-->>BL: Confirmation of place creation
+    BL-->>Facade: Return success or error
+    Facade-->>API: Return final result
+    API-->>User: Display confirmation or error

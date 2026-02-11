@@ -1,0 +1,29 @@
+flowchart TD
+    %% Couche de Présentation
+    subgraph "Presentation Layer"
+        A["API Services<br/>Endpoints<br/>Controllers<br/>- Reçoit les requêtes<br/>- Trouve l'endpoint<br/>- Appelle la Facade"]
+    end
+
+    %% Couche Logique Métier
+    subgraph "Business Logic Layer"
+        F["Facade Interface<br/>- Coordonne les demandes de l'API<br/>- Décide quoi faire"]
+        B["Business Models<br/>User, Place, Review, Amenity<br/>- Contiennent les données et règles du projet"]
+    end
+
+    %% Couche Persistance
+    subgraph "Persistence Layer"
+        C["Repositories / DAO<br/>- Sauvegarde et récupère les données<br/>- Intermédiaire entre Models et Database"]
+        D[("Database<br/>JSON / MySQL<br/>- Stocke les données réelles")]
+    end
+
+    %% Connexions
+    A --> F
+    F --> B
+    B --> C
+    C --> D
+
+    %% Styles
+    classDef layer fill:#ffffff,stroke:#000,stroke-width:2px,color:#000
+    classDef facade fill:#f0f0f0,stroke:#333,stroke-width:2px,color:#000
+    class A,B,C,D layer
+    class F facade

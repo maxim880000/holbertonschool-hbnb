@@ -1,0 +1,16 @@
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as API/Service Layer
+    participant Facade as Business Facade
+    participant BL as Business Logic Layer
+    participant DB as Database Layer
+
+    User->>API: Request list of places (filters: location, price, amenities)
+    API->>Facade: getPlaces(filters)
+    Facade->>BL: Apply business rules and requests preparation
+    BL->>DB: Retrieve places matching criteria
+    DB-->>BL: Return list of places
+    BL-->>Facade: Return filtered and formatted data
+    Facade-->>API: Return final result
+    API-->>User: Display list of places

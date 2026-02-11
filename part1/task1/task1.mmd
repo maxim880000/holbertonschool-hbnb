@@ -1,0 +1,74 @@
+classDiagram
+    %% Classes de la couche Logique Métier
+
+    %% User
+    class User {
+        +UUID id
+        +string first_name
+        +string last_name
+        +string email
+        +string password
+        +bool is_admin
+        +datetime created_at
+        +datetime updated_at
+
+        +create()
+        +update()
+        +delete()
+		+read()
+    }
+
+    %% Place
+    class Place {
+        +UUID id
+        +string title
+        +string description
+        +float price
+        +float latitude
+        +float longitude
+        +UUID owner_id
+        +datetime created_at
+        +datetime updated_at
+
+        +create()
+        +update()
+        +delete()
+		+read()
+    }
+
+    %% Review
+    class Review {
+        +UUID id
+        +string comment
+        +int rating
+        +datetime created_at
+        +datetime updated_at
+
+        +create()
+        +update()
+        +delete()
+		+read()
+        +listByPlace(place_id)
+    }
+
+    %% Amenity
+    class Amenity {
+        +UUID id
+        +string name
+        +string description
+		+string icon_url
+        +datetime created_at
+        +datetime updated_at
+
+        +create()
+        +update()
+        +delete()
+		+read()
+        +list()
+    }
+
+    %% Relations
+    User "1" --> "*" Place : owns
+    User "1" --> "*" Review : writes
+    Place "1" --> "*" Review : has
+    Place "*" --> "*" Amenity : contains

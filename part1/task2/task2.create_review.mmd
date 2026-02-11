@@ -1,0 +1,16 @@
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as API/Service Layer
+    participant Facade as Business Facade
+    participant BL as Business Logic Layer
+    participant DB as Database Layer
+
+    User->>API: Submit review form (placeId, rating, comment)
+    API->>Facade: submitReview(data, userId)
+    Facade->>BL: Validate review data and check user permissions
+    BL->>DB: Insert new review linked to user and place
+    DB-->>BL: Confirmation of review creation
+    BL-->>Facade: Return success or error
+    Facade-->>API: Return final result
+    API-->>User: Display confirmation or error
