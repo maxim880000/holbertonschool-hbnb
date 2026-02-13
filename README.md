@@ -101,11 +101,3 @@ $ all User
 - Carlos Silva — [GitHub](https://github.com/CodexSC's)
 ---
 
-## 🔧 Remarques finales
-
-- Adaptez les commandes ci‑dessus selon vos fichiers réels (`console.py`, `tests/`, etc.).
-- Si vous souhaitez, je peux :
-  1. Ajouter un badge CI / Coverage
-  2. Générer un `requirements.txt`
-  3. Compléter le README avec des exemples de sorties
-
