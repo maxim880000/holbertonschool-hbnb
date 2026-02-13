@@ -40,25 +40,6 @@ Un clone pédagogique simplifié d'AirBnB (projet Holberton). Ce dépôt contien
 
 ---
 
-## ▶️ Utilisation (exemples de commandes `console`)
-
-- `create <ClassName>` — crée une instance et affiche son id
-- `show <ClassName> <id>` — affiche l'objet
-- `destroy <ClassName> <id>` — supprime l'objet
-- `all [<ClassName>]` — liste toutes les instances (ou celles d'une classe)
-- `update <ClassName> <id> <attribute_name> "<value>"` — met à jour un attribut
-
-Exemple :
-
-```bash
-$ create User
-$ show User 1234-1234-1234
-$ update User 1234-1234-1234 email "user@example.com"
-$ all User
-```
-
----
-
 ## ✅ Tests & style
 
 - Tests unitaires (si fournis) :
