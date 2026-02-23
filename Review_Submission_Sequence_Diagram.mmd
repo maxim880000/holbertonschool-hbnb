@@ -1,0 +1,64 @@
+sequenceDiagram
+    autonumber
+    actor Client as User
+    participant API as Presentation Layer (Review API Endpoint)
+    participant RService as Business Logic (ReviewService)
+    participant URepo as Persistence (User Repository)
+    participant PRepo as Persistence (Place Repository)
+    participant RVRepo as Persistence (Review Repository)
+    participant DB as Database
+
+    Client->>API: POST /api/v1/reviews\n{user_id, place_id, rating, comment}
+    API->>RService: submit_review(payload)
+
+    RService->>URepo: get_by_id(user_id)
+    URepo->>DB: SELECT * FROM users WHERE id=user_id
+    DB-->>URepo: user record / null
+    URepo-->>RService: user
+
+    alt User not found
+        RService-->>API: DomainError(UserNotFound)
+        API-->>Client: 404 Not Found
+    else User exists
+        RService->>PRepo: get_by_id(place_id)
+        PRepo->>DB: SELECT * FROM places WHERE id=place_id
+        DB-->>PRepo: place record / null
+        PRepo-->>RService: place
+
+        alt Place not found
+            RService-->>API: DomainError(PlaceNotFound)
+            API-->>Client: 404 Not Found
+        else Place exists
+            RService->>RService: validate_rating(1..5)
+            RService->>RService: validate_comment(10..500 chars)
+            RService->>RService: check_self_review(user_id != place.owner_id)
+
+            alt Validation or self-review fails
+                RService-->>API: DomainError(ValidationError/SelfReviewError)
+                API-->>Client: 400 Bad Request
+            else Validation passes
+                RService->>RVRepo: find_by_user_and_place(user_id, place_id)
+                RVRepo->>DB: SELECT * FROM reviews WHERE user_id=? AND place_id=?
+                DB-->>RVRepo: existing review / null
+                RVRepo-->>RService: duplicate review?
+
+                alt Duplicate review exists
+                    RService-->>API: DomainError(DuplicateReviewError)
+                    API-->>Client: 409 Conflict
+                else No duplicate
+                    RService->>RVRepo: create(user_id, place_id, rating, comment)
+                    RVRepo->>DB: INSERT INTO reviews (...)
+                    DB-->>RVRepo: review_id + timestamps
+                    RVRepo-->>RService: created review
+
+                    RService->>RVRepo: compute_place_average_rating(place_id)
+                    RVRepo->>DB: SELECT AVG(rating) FROM reviews WHERE place_id=?
+                    DB-->>RVRepo: average rating
+                    RVRepo-->>RService: average rating
+
+                    RService-->>API: ReviewDTO + aggregate metadata
+                    API-->>Client: 201 Created\n{review, avg_rating}
+                end
+            end
+        end
+    end
