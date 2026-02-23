@@ -1,0 +1,68 @@
+classDiagram
+
+    class BaseModel {
+        +UUID4 id
+        +datetime created_at
+        +datetime updated_at
+        +save()
+        +to_dict()
+        +update()
+    }
+
+    class User {
+        +str first_name
+        +str last_name
+        +str email
+        +str password_hash
+        +bool is_admin
+        +register()
+        +update_profile()
+        +change_password()
+        +delete()
+        +authenticate()
+    }
+
+    class Place {
+        +str title
+        +str description
+        +float price_per_night
+        +float latitude
+        +float longitude
+        +int max_guests
+        +bool is_available
+        +create()
+        +update()
+        +delete()
+        +set_availability()
+        +list_amenities()
+        +add_amenity()
+        +remove_amenity()
+        +get_average_rating()
+    }
+
+    class Review {
+        +int rating
+        +str comment
+        +create()
+        +update()
+        +delete()
+        +validate_rating()
+    }
+
+    class Amenity {
+        +str name
+        +str description
+        +create()
+        +update()
+        +delete()
+    }
+
+    BaseModel <|-- User : extends
+    BaseModel <|-- Place : extends
+    BaseModel <|-- Review : extends
+    BaseModel <|-- Amenity : extends
+
+    User "1" *-- "0..*" Place : owns
+    User "1" *-- "0..*" Review : writes
+    Place "1" *-- "0..*" Review : receives
+    Place "0..*" o-- "0..*" Amenity : offers
