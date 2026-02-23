@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant User
+    participant API as API/Service Layer
+    participant Facade as Business Facade
+    participant BL as Business Logic Layer
+    participant DB as Database Layer
+
+    %% Étape 1 : L'utilisateur soumet le formulaire
+    User->>API: Submit new place form (title, description, price, location, amenities)
+
+    %% Étape 2 : Validation API
+    API->>API: Validate request body & authentication
+    API-->>User: 400 Bad Request (missing or malformed fields)
+    API-->>User: 401 Unauthorized (invalid/missing token)
+
+    %% Étape 3 : Appel à la Facade
+    API->>Facade: createPlace(data, userId)
+
+    %% Étape 4 : Validation logique + règles métier
+    Facade->>BL: Validate input & ownership
+    BL-->>Facade: 404 Not Found (user not found)
+
+    %% Étape 5 : Persistance
+    BL->>DB: Insert new place with owner reference
+    DB-->>BL: Confirmation of place creation
+
+    %% Étape 6 : Retour du BL
+    BL-->>Facade: Return success or error
+
+    %% Étape 7 : Retour Facade → API
+    Facade-->>API: Return final result
+
+    %% Étape 8 : Retour API → User
+    API-->>User: 200 OK (place created successfully)
