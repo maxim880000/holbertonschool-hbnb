@@ -108,18 +108,16 @@ class User(BaseModel):
 from .base_model import BaseModel
 
 
-class User(BaseModel):
+class User(BaseModel): # section pour définir les champs spécifiques à l'utilisateur, comme email, password, first_name et last_name. Le champ email est requis et doit être unique, tandis que les autres champs sont optionnels.
     def __init__(self, **kwargs):
-        # required attributes
         self.email = kwargs.get('email')
         self.password = kwargs.get('password')
         self.first_name = kwargs.get('first_name', '')
         self.last_name = kwargs.get('last_name', '')
         super().__init__(**kwargs)
 
-    def to_dict(self):
+    def to_dict(self): # section pour convertir l'objet en dictionnaire, en excluant les champs sensibles comme le mot de passe dans le cas de l'utilisateur
         d = super().to_dict()
-        # never expose password in API responses
         if 'password' in d:
             d.pop('password')
         return d

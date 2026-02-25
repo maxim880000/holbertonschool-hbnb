@@ -3,7 +3,7 @@ import unittest
 from app import create_app
 
 
-class UsersAPITestCase(unittest.TestCase):
+class UsersAPITestCase(unittest.TestCase):# section pour tester les endpoints de l'API liés aux utilisateurs, en vérifiant les opérations CRUD (Create, Read, Update, Delete) ainsi que les cas d'erreur comme la création d'un utilisateur avec un email déjà existant.
     def setUp(self):
         self.app = create_app()
         self.client = self.app.test_client()
