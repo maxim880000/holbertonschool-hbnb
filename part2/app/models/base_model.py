@@ -1,58 +1,35 @@
-# UUID for unique identifiers and datetime utilities (UTC-aware)
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime
 
 class BaseModel:
-    """
-    Base class for HBnB models.
-
-    Provides a UUID `id` plus `created_at`/`updated_at` timestamps
-    (UTC-aware) and common helpers used throughout the project. The
-    constructor accepts ``**kwargs`` so instances can be reconstructed
-    from persisted data.
-    """
-
-    def __init__(self, **kwargs):
-        # identifier
-        self.id = kwargs.get('id', str(uuid.uuid4()))
-
-        # timestamps (keep provided values when rebuilding)
-        now = datetime.now(timezone.utc)
-        self.created_at = kwargs.get('created_at', now)
-        self.updated_at = kwargs.get('updated_at', now)
-
-        # assign any extra attributes passed via kwargs
-        for key, value in kwargs.items():
-            if key not in {'id', 'created_at', 'updated_at'}:
-                setattr(self, key, value)
+    def __init__(self):
+        self.id = str(uuid.uuid4())
+        # uuid.uuid4() génère un identifiant unique universel (ex: "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        # str() le convertit en chaîne car le repo stocke des strings
+        
+        self.created_at = datetime.now()
+        # datetime.now() capture la date et l'heure exacte de la création
+        
+        self.updated_at = datetime.now()
+        # Même chose, sera mis à jour à chaque modification
 
     def save(self):
-        """Refresh the ``updated_at`` timestamp to current UTC time."""
-        self.updated_at = datetime.now(timezone.utc)
+        """Appelé à chaque modification pour mettre à jour updated_at"""
+        self.updated_at = datetime.now()
 
-    def update(self, data: dict):
-        """Update attributes from a dict and bump ``updated_at``.
-
-        Reserved fields ``id`` and ``created_at`` are ignored to avoid
-        inadvertently altering identity or creation time.
+    def update(self, data):
+        """Met à jour les attributs depuis un dictionnaire
+        
+        Exemple: user.update({"first_name": "Jane"})
         """
         for key, value in data.items():
-            if key in {'id', 'created_at'}:
-                continue
-            setattr(self, key, value)
-        self.save()
-
-    def to_dict(self):
-        """Return a dict representation with ISO‑formatted timestamps.
-
-        Any :class:`datetime` values are converted to ``ISO`` strings so
-        the result is JSON-serializable.
-        """
-        result = {}
-        for k, v in self.__dict__.items():
-            if isinstance(v, datetime):
-                result[k] = v.isoformat()
-            else:
-                result[k] = v
-        return result
+            # data.items() retourne des paires (clé, valeur)
+            # ex: [("first_name", "Jane"), ("email", "jane@x.com")]
+            
+            if hasattr(self, key):
+                # hasattr vérifie que l'attribut existe sur l'objet
+                # Sécurité : évite d'ajouter des attributs inconnus
+                setattr(self, key, value)
+                # setattr(obj, "first_name", "Jane") équivaut à obj.first_name = "Jane"
+        
+        self.save()  # Met à jour updated_at
