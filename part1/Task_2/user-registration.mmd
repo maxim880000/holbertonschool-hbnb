@@ -1,0 +1,79 @@
+sequenceDiagram
+    participant User
+    participant API
+    participant Facade
+    participant UserModel
+    participant Repository
+    participant Database
+
+    User->>API: POST /users {email, password, first_name, last_name}
+    
+    alt Missing required fields
+        API-->>User: 400 Bad Request (Missing required fields: email, password)
+    
+    else Invalid email format
+        API->>Facade: createUser(userData)
+        Facade->>UserModel: validate(email, password)
+        UserModel-->>Facade: Validation Failed (Invalid email format)
+        Facade-->>API: Validation error
+        API-->>User: 400 Bad Request (Invalid email format)
+    
+    else Weak password
+        API->>Facade: createUser(userData)
+        Facade->>UserModel: validate(email, password)
+        UserModel-->>Facade: Validation Failed (Password too weak)
+        Facade-->>API: Validation error
+        API-->>User: 400 Bad Request (Password must be at least 8 characters)
+    
+    else Email already exists
+        API->>Facade: createUser(userData)
+        Facade->>UserModel: validate(email, password)
+        UserModel-->>Facade: Validation OK
+        Facade->>UserModel: create User instance
+        UserModel->>Repository: save(user)
+        Repository->>Database: INSERT INTO users VALUES (...)
+        Database-->>Repository: Duplicate key error (email)
+        Repository-->>UserModel: Email already exists
+        UserModel-->>Facade: Duplicate email error
+        Facade-->>API: Conflict error
+        API-->>User: 409 Conflict (Email already registered)
+    
+    else Database connection error
+        API->>Facade: createUser(userData)
+        Facade->>UserModel: validate(email, password)
+        UserModel-->>Facade: Validation OK
+        Facade->>UserModel: create User instance
+        UserModel->>Repository: save(user)
+        Repository->>Database: INSERT INTO users VALUES (...)
+        Database-->>Repository: Connection Error
+        Repository-->>UserModel: Database error
+        UserModel-->>Facade: Save failed
+        Facade-->>API: Error response
+        API-->>User: 500 Internal Server Error (Database unavailable)
+    
+    else Database timeout
+        API->>Facade: createUser(userData)
+        Facade->>UserModel: validate(email, password)
+        UserModel-->>Facade: Validation OK
+        Facade->>UserModel: create User instance
+        UserModel->>Repository: save(user)
+        Repository->>Database: INSERT INTO users VALUES (...)
+        Database-->>Repository: Timeout Error
+        Repository-->>UserModel: Timeout
+        UserModel-->>Facade: Operation timeout
+        Facade-->>API: Timeout error
+        API-->>User: 504 Gateway Timeout (Request timeout)
+    
+    else Success
+        API->>Facade: createUser(userData)
+        Facade->>UserModel: validate(email, password)
+        UserModel-->>Facade: Validation OK
+        Facade->>UserModel: create User instance
+        UserModel->>Repository: save(user)
+        Repository->>Database: INSERT INTO users VALUES (...)
+        Database-->>Repository: Success (user_id)
+        Repository-->>UserModel: User saved
+        UserModel-->>Facade: User object with id
+        Facade-->>API: Success response
+        API-->>User: 201 Created {id, email, created_at}
+    end

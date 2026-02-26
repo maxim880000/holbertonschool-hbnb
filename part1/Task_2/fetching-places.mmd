@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant User
+    participant API
+    participant Facade
+    participant Repository
+    participant Database
+
+    User->>API: GET /places?location=Paris&max_price=200
+    
+    alt Invalid parameters
+        API-->>User: 400 Bad Request (Invalid query parameters)
+    else Valid parameters
+        API->>Facade: getPlaces(criteria)
+        
+        alt Database connection error
+            Facade->>Repository: findAll(filters)
+            Repository->>Database: SELECT * FROM places WHERE location LIKE '%Paris%' AND price <= 200
+            Database-->>Repository: Connection Error
+            Repository-->>Facade: Database error
+            Facade-->>API: Error response
+            API-->>User: 500 Internal Server Error (Database unavailable)
+        
+        else No places found
+            Facade->>Repository: findAll(filters)
+            Repository->>Database: SELECT * FROM places WHERE location LIKE '%Paris%' AND price <= 200
+            Database-->>Repository: Empty result
+            Repository-->>Facade: Empty array []
+            Facade-->>API: Success with empty list
+            API-->>User: 200 OK []
+        
+        else Success
+            Facade->>Repository: findAll(filters)
+            Repository->>Database: SELECT * FROM places WHERE location LIKE '%Paris%' AND price <= 200
+            Database-->>Repository: List of matching places
+            Repository-->>Facade: Place objects []
+            Facade->>Facade: Format response data
+            Facade-->>API: Success response with places list
+            API-->>User: 200 OK [{id, title, price}, {id, title, price}, ...]
+        end
+    end

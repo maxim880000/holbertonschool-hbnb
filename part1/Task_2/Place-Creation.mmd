@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant User
+    participant API as API/Service Layer
+    participant Facade as Business Facade
+    participant BL as Business Logic Layer
+    participant DB as Database Layer
+
+    User->>API: Submit new place form (title, description, price, location, amenities)
+
+    alt Invalid data, request rejected
+        API-->>User: 400 Bad Request
+    else Missing token, access denied
+        API-->>User: 401 Unauthorized
+    else Valid request
+        API->>Facade: createPlace(data, userId)
+
+        Facade->>BL: Validate input
+
+        alt
+            BL-->>Facade: User not found
+            Facade-->>API: User not found
+            API-->>User: 404 Not Found
+        else  Validation successful
+            BL->>DB: Insert new place with owner reference
+            DB-->>BL: Confirmation of place creation
+            BL-->>Facade: Return success
+            Facade-->>API: Return final result
+            API-->>User: 201 Created
+        end
+    end
