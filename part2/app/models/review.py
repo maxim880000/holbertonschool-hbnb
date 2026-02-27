@@ -26,7 +26,7 @@ class Review(BaseModel):
             raise ValueError("user is required")
             # user doit être une instance de User existante
 
-        # --- Assignation des attributs ---
+        # Assignation des attributs
         self.rating = rating
         # Entier entre 1 et 5
 

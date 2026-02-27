@@ -13,11 +13,9 @@ class User(BaseModel):
         # super().__init__() appelle le constructeur de BaseModel
         # Initialise id, created_at, updated_at, crud_profile
 
-        # --- Validations ---
+        # Validations
         if not first_name or len(first_name) > 50:
             raise ValueError("first_name is required and must be under 50 characters")
-            # not first_name = True si first_name est None ou ""
-            # len(first_name) > 50 vérifie la longueur maximale
 
         if not last_name or len(last_name) > 50:
             raise ValueError("last_name is required and must be under 50 characters")
@@ -29,12 +27,12 @@ class User(BaseModel):
         if not password:
             raise ValueError("password is required")
 
-        # --- Assignation des attributs ---
+        # Assignation des attributs
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.password_hash = self._hash_password(password)
-        # On ne stocke jamais le mot de passe en clair !
+        # On ne stocke jamais le mot de passe en clair
         # On stocke uniquement son hash
 
         self.is_admin = is_admin
@@ -96,7 +94,7 @@ class User(BaseModel):
         """
         return self.password_hash == self._hash_password(password)
         # On hache le mot de passe fourni et on compare avec le hash stocké
-        # On ne compare jamais en clair !
+        # On ne compare jamais en clair
 
     def to_dict(self):
         """Surcharge to_dict() de BaseModel pour ajouter les attributs de User
@@ -110,6 +108,6 @@ class User(BaseModel):
             'last_name': self.last_name,
             'email': self.email,
             'is_admin': self.is_admin
-            # password_hash volontairement absent !
+            # password_hash volontairement absent
         })
         return base

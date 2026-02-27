@@ -9,7 +9,7 @@ class Place(BaseModel):
         super().__init__()
         # Appelle le constructeur de BaseModel
 
-        # --- Validations ---
+        # Validations
         if not title or len(title) > 100:
             raise ValueError("title is required and must be under 100 characters")
 
@@ -33,7 +33,7 @@ class Place(BaseModel):
             raise ValueError("owner is required")
             # Chaque lieu doit avoir un propriétaire (instance de User)
 
-        # --- Assignation des attributs ---
+        # Assignation des attributs
         self.title = title
         self.description = description
         self.price = price
@@ -63,7 +63,7 @@ class Place(BaseModel):
     def update(self, data):
         """Met à jour uniquement les champs autorisés du lieu"""
         allowed = ['title', 'description', 'price',
-                   'latitude', 'longitude', 'max_guests', 'is_available']
+                'latitude', 'longitude', 'max_guests', 'is_available']
         # owner n'est pas modifiable ici
         filtered = {k: v for k, v in data.items() if k in allowed}
         super().update(filtered)
