@@ -31,7 +31,7 @@ class PlaceList(Resource):
             # La facade valide owner_id, price, latitude, longitude
             # et lève ValueError si quelque chose est invalide
         except ValueError as e:
-            return {'error': str(e)}, 400
+            return {'message': str(e)}, 400
             # On retourne l'erreur avec un code 400 Bad Request
 
         return {
