@@ -33,3 +33,20 @@ class BaseModel:
                 # setattr(obj, "first_name", "Jane") équivaut à obj.first_name = "Jane"
         
         self.save()  # Met à jour updated_at
+
+    def to_dict(self):
+        """Retourne un dictionnaire des attributs de base
+        
+        Exemple: user.to_dict() → {"id": "3fa85f64...", "created_at": "2024-01-01T00:00:00", ...}
+        """
+        return {
+            'id': self.id,
+            # L'identifiant unique de l'objet
+            
+            'created_at': self.created_at.isoformat(),
+            # .isoformat() convertit le datetime en string lisible
+            # ex: datetime(2024, 1, 1) → "2024-01-01T00:00:00"
+            
+            'updated_at': self.updated_at.isoformat()
+            # Même chose pour la date de dernière modification
+        }
