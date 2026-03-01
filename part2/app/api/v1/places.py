@@ -54,6 +54,9 @@ class PlaceList(Resource):
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
+        if not hasattr(facade, 'get_all_places'):
+            # La méthode n'est pas encore implémentée dans la facade
+            return {'error': 'Listing places is not implemented in the service layer'}, 501
         places = facade.get_all_places()
         # get_all_places() retourne une liste de tous les objets Place
 
