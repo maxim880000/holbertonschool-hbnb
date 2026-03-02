@@ -1,67 +1,52 @@
 from app.models.base_model import BaseModel
 
-
 class Amenity(BaseModel):
-    # Représente un équipement (Wi-Fi, Parking…)
-    # Relation : liée à plusieurs Places (many-to-many)
+    # Amenity hérite de BaseModel
+    # Représente un équipement disponible dans un lieu
+    # ex: "Wi-Fi", "Parking", "Piscine"
 
-    def __init__(self, name, description="", **kwargs):
-        """Initialise une amenity avec un nom et une description validés."""
-        super().__init__(**kwargs)
-        self.name = name              # passe par le setter (validation)
+    def __init__(self, name, description=""):
+        super().__init__()
+        # Appelle le constructeur de BaseModel
+
+        if not name or len(name) > 50:
+            raise ValueError("name is required and must be under 50 characters")
+            # not name = True si name est None ou ""
+
+        self.name = name
         self.description = description
+        # description est optionnelle, vide par défaut
 
-    # ------------------------------------------------------------------ #
-    #  name                                                                #
-    # ------------------------------------------------------------------ #
-    @property
-    def name(self):
-        """Retourne le nom de l'amenity."""
-        return self._name
+    def create(self):
+        """Marque l'amenity comme créée"""
+        self.crud_profile = "created"
+        self.save()
 
-    @name.setter
-    def name(self, value):
-        """Valide que le nom est une chaîne non vide, max 50 caractères."""
-        if not value or not isinstance(value, str):
-            raise ValueError("name is required.")
-        value = value.strip()           # strip AVANT la vérification de longueur
-        if not value:                   # attrape les chaînes tout-blancs ex: "   "
-            raise ValueError("name is required.")
-        if len(value) > 50:
-            raise ValueError("name must be 50 characters or fewer.")
-        self._name = value
+    def update(self, data):
+        """Met à jour uniquement les champs autorisés
+        
+        Surcharge update() de BaseModel pour filtrer les champs
+        """
+        allowed = ['name', 'description']
+        filtered = {k: v for k, v in data.items() if k in allowed}
+        # Ne garde que name et description
+        super().update(filtered)
+        # Appelle BaseModel.update() avec les données filtrées
 
-    # ------------------------------------------------------------------ #
-    #  description                                                         #
-    # ------------------------------------------------------------------ #
-    @property
-    def description(self):
-        """Retourne la description de l'amenity."""
-        return self._description
-
-    @description.setter
-    def description(self, value):
-        """Valide que la description est une chaîne (ou vide par défaut)."""
-        if value is not None and not isinstance(value, str):
-            raise TypeError("description must be a string.")
-        self._description = value.strip() if value else ""
-
-    # ------------------------------------------------------------------ #
-    #  update                                                              #
-    # ------------------------------------------------------------------ #
-    def update(self, data: dict):
-        """Applique les modifications et rafraîchit updated_at."""
-        if "name" in data:
-            self.name = data["name"]           # setter → validation automatique
-        if "description" in data:
-            self.description = data["description"]
-        self.save()                            # rafraîchit updated_at (BaseModel)
+    def delete(self):
+        """Marque l'amenity comme supprimée"""
+        self.crud_profile = "deleted"
+        self.save()
 
     # ------------------------------------------------------------------ #
     #  sérialisation                                                       #
     # ------------------------------------------------------------------ #
     def to_dict(self):
-        """Retourne un dict avec le nom et la description."""
-        d = super().to_dict()
-        d.update({"name": self.name, "description": self.description})
-        return d
+        """Surcharge to_dict() pour ajouter les attributs de Amenity"""
+        base = super().to_dict()
+        # Récupère id, created_at, updated_at
+        base.update({
+            'name': self.name,
+            'description': self.description
+        })
+        return base

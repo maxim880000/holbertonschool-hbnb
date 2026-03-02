@@ -1,59 +1,52 @@
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime
 
 class BaseModel:
-    """
-    Base class for HBnB models.
-    Provides a UUID `id` plus `created_at`/`updated_at` timestamps
-    (UTC-aware) and common helpers used throughout the project. The
-    constructor accepts ``**kwargs`` so instances can be reconstructed
-    from persisted data.
-    """
-
-    def __init__(self, **kwargs):
-        # identifier
-        self.id = kwargs.get('id', str(uuid.uuid4()))
-
-        # timestamps (keep provided values when rebuilding from persisted data)
-        now = datetime.now(timezone.utc)
-        self.created_at = kwargs.get('created_at', now)
-        self.updated_at = kwargs.get('updated_at', now)
-
-        # assign any extra attributes passed via kwargs
-        for key, value in kwargs.items():
-            if key not in {'id', 'created_at', 'updated_at'}:
-                setattr(self, key, value)
+    def __init__(self):
+        self.id = str(uuid.uuid4())
+        # uuid.uuid4() génère un identifiant unique universel (ex: "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        # str() le convertit en chaîne car le repo stocke des strings
+        
+        self.created_at = datetime.now()
+        # datetime.now() capture la date et l'heure exacte de la création
+        
+        self.updated_at = datetime.now()
+        # Même chose, sera mis à jour à chaque modification
 
     def save(self):
-        """Refresh the ``updated_at`` timestamp to current UTC time."""
-        self.updated_at = datetime.now(timezone.utc)
+        """Appelé à chaque modification pour mettre à jour updated_at"""
+        self.updated_at = datetime.now()
 
-    def update(self, data: dict):
-        """Update attributes from a dict and bump ``updated_at``.
-
-        Reserved fields ``id`` and ``created_at`` are ignored to avoid
-        inadvertently altering identity or creation time.
-        ``setattr`` is used so property setters on subclasses are
-        triggered, keeping validation in one place.
+    def update(self, data):
+        """Met à jour les attributs depuis un dictionnaire
+        
+        Exemple: user.update({"first_name": "Jane"})
         """
         for key, value in data.items():
-            if key in {'id', 'created_at'}:
-                continue
-            setattr(self, key, value)
-        self.save()
+            # data.items() retourne des paires (clé, valeur)
+            # ex: [("first_name", "Jane"), ("email", "jane@x.com")]
+            
+            if hasattr(self, key):
+                # hasattr vérifie que l'attribut existe sur l'objet
+                # Sécurité : évite d'ajouter des attributs inconnus
+                setattr(self, key, value)
+                # setattr(obj, "first_name", "Jane") équivaut à obj.first_name = "Jane"
+        
+        self.save()  # Met à jour updated_at
 
     def to_dict(self):
-        """Return a dict representation with ISO-formatted timestamps.
-
-        Private backing attributes (``_name``, ``_description``, …) are
-        skipped — subclasses expose those fields through their own
-        ``to_dict()`` via property access, avoiding double-serialization
-        of the same data under a mangled name.
+        """Retourne un dictionnaire des attributs de base
+        
+        Exemple: user.to_dict() → {"id": "3fa85f64...", "created_at": "2024-01-01T00:00:00", ...}
         """
-        result = {}
-        for k, v in self.__dict__.items():
-            if k.startswith('_'):
-                continue            # exposed cleanly by subclass to_dict()
-            result[k] = v.isoformat() if isinstance(v, datetime) else v
-        return result
+        return {
+            'id': self.id,
+            # L'identifiant unique de l'objet
+            
+            'created_at': self.created_at.isoformat(),
+            # .isoformat() convertit le datetime en string lisible
+            # ex: datetime(2024, 1, 1) → "2024-01-01T00:00:00"
+            
+            'updated_at': self.updated_at.isoformat()
+            # Même chose pour la date de dernière modification
+        }
