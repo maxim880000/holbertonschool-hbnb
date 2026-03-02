@@ -38,6 +38,9 @@ class Amenity(BaseModel):
         self.crud_profile = "deleted"
         self.save()
 
+    # ------------------------------------------------------------------ #
+    #  sérialisation                                                       #
+    # ------------------------------------------------------------------ #
     def to_dict(self):
         """Surcharge to_dict() pour ajouter les attributs de Amenity"""
         base = super().to_dict()

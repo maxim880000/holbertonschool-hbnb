@@ -130,6 +130,8 @@ class Place(BaseModel):
         # len() compte le nombre de reviews
         # ex: sum([5,4,3]) / 3 = 4.0
 
+    # ── Sérialisation ────────────────────────────────────────────────────────
+
     def to_dict(self):
         """Surcharge to_dict() pour ajouter les attributs de Place"""
         base = super().to_dict()
