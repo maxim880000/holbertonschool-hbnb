@@ -1,0 +1,29 @@
+Étape 1 — Ajouter la validation dans vos modèles
+Pour chaque entité (ex: User, Place, Review), ajoutez des vérifications de base :
+
+Les champs obligatoires ne sont pas vides
+Les emails ont un format valide (@ présent)
+Les strings ont une longueur minimale/maximale
+Les nombres sont dans une plage valide (ex: note entre 1 et 5)
+
+
+Étape 2 — Tester avec cURL
+Pour chaque endpoint, lancez des requêtes dans votre terminal. Par exemple :
+bash# Créer un utilisateur (cas réussi)
+curl -X POST http://localhost:5000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice", "email": "alice@example.com"}'
+
+# Cas d'erreur (champ manquant)
+curl -X POST http://localhost:5000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": ""}'
+
+Étape 3 — Écrire des tests unitaires
+Créez un fichier test_api.py avec pytest qui teste automatiquement chaque endpoint.
+
+Étape 4 — Rédiger le rapport de tests
+Un document qui liste chaque test avec : la requête envoyée, le résultat attendu, le résultat obtenu, et ✅ ou ❌.
+
+Étape 5 — Vérifier le Swagger
+Ouvrez http://localhost:5000/ dans votre navigateur pour voir la documentation générée automatiquement par Flask-RESTx.
