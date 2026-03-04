@@ -25,7 +25,7 @@ from datetime import datetime
 class BaseModel:
     def __init__(self):
         self.id = str(uuid.uuid4())
-        # uuid.uuid4() génère un identifiant unique universel (ex: "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        # uuid.uuid4() génère un identifiant unique universel
         # str() le convertit en chaîne car le repo stocke des strings
         
         self.created_at = datetime.now()
@@ -57,8 +57,8 @@ class BaseModel:
 
     def to_dict(self):
         """Retourne un dictionnaire des attributs de base
-        
-        Exemple: user.to_dict() → {"id": "3fa85f64...", "created_at": "2024-01-01T00:00:00", ...}
+        EX = user.to_dict() → 
+        {"id": "3fa85f64...", "created_at": "2024-01-01T00:00:00", ...}
         """
         return {
             'id': self.id,
