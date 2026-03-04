@@ -9,7 +9,7 @@ from uuid import uuid4
 
 class BaseModel:
     def __init__(self):
-        self.id = str(uuid.uuid4())
+        self.id = str(uuid4())
         # uuid.uuid4() génère un identifiant unique universel
         # str() le convertit en chaîne car le repo stocke des strings
         
