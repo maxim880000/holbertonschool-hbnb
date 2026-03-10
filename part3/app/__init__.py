@@ -1,7 +1,10 @@
 from flask import Flask
 from flask_restx import Api
+from flask_bcrypt import Bcrypt
 
 from app.config import config
+
+bcrypt = Bcrypt()
 
 
 def create_app(config_name='development'):
@@ -15,6 +18,9 @@ def create_app(config_name='development'):
 
     # configuration
     app.config.from_object(config[config_name])
+
+    # extensions
+    bcrypt.init_app(app)
 
     # API setup
     api = Api(
@@ -30,9 +36,7 @@ def create_app(config_name='development'):
     api.add_namespace(users_ns, path='/api/v1/users')
 
     from app.api.v1.places import api as places_ns
-    # On importe le namespace places depuis api/v1/places.py
     api.add_namespace(places_ns, path='/api/v1/places')
-    # Tous les endpoints de places.py seront accessibles via /api/v1/places
 
     from app.api.v1.amenities import api as amenities_ns
     api.add_namespace(amenities_ns, path='/api/v1/amenities')

@@ -39,6 +39,8 @@ class HBnBFacade:
             raise ValueError('email already in use')
         from app.models.user import User
         user = User(**user_data)
+        # Le hash bcrypt est appliqué dans User.__init__() via hash_password()
+        # Pas besoin de le faire ici, le modèle s'en charge automatiquement
         self.user_repo.add(user)
         return user
 
@@ -46,6 +48,10 @@ class HBnBFacade:
         user = self.get_user(user_id)
         if not user:
             return None
+        # Si un nouveau mot de passe est fourni, on le re-hashe via bcrypt
+        # On ne le passe PAS dans update() qui écrirait le hash en clair
+        if 'password' in data:
+            user.hash_password(data.pop('password'))
         data = {k: v for k, v in data.items() if k != 'email'}
         user.update(data)
         return user

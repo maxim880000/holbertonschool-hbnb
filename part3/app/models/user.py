@@ -1,10 +1,8 @@
 from app.models.base_model import BaseModel
-# On importe BaseModel pour que User puisse en hériter
-import hashlib
 import re
-# hashlib est un module Python standard pour hacher des données (mots de passe)
 
 _EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+
 
 class User(BaseModel):
     # User hérite de BaseModel
@@ -13,8 +11,6 @@ class User(BaseModel):
 
     def __init__(self, first_name, last_name, email, password, is_admin=False):
         super().__init__()
-        # super().__init__() appelle le constructeur de BaseModel
-        # Initialise id, created_at, updated_at, crud_profile
 
         # Validations
         if not first_name or len(first_name) > 50:
@@ -25,7 +21,6 @@ class User(BaseModel):
 
         if not email or not _EMAIL_RE.match(email):
             raise ValueError("A valid email is required")
-            # regex vérifie le format : local@domain.tld
 
         if not password:
             raise ValueError("password is required")
@@ -34,83 +29,89 @@ class User(BaseModel):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.password_hash = self._hash_password(password)
-        # On ne stocke jamais le mot de passe en clair
-        # On stocke uniquement son hash
-
         self.is_admin = is_admin
-        # False par défaut, True uniquement pour les administrateurs
 
-    def _hash_password(self, password):
-        """Hash le mot de passe en SHA256
-        
-        Le _ devant le nom indique que c'est une méthode privée
-        Elle ne doit pas être appelée depuis l'extérieur de la classe
-        
-        Exemple:
-        _hash_password("secret") → "2bb80d537b1da3e38bd30361aa855686..."
+        # Le mot de passe est hashé via bcrypt, jamais stocké en clair
+        self.password = ""
+        self.hash_password(password)
+
+    # ------------------------------------------------------------------ #
+    #  Méthodes bcrypt (imposées par le sujet)                            #
+    # ------------------------------------------------------------------ #
+
+    def hash_password(self, password):
+        """Hash le mot de passe avec bcrypt et le stocke dans self.password.
+
+        bcrypt est supérieur à SHA256 pour les mots de passe car :
+        - il intègre un salt automatique (protection contre rainbow tables)
+        - il est volontairement lent (protection contre brute force)
+
+        Exemple: hash_password("secret") → "$2b$12$..."
         """
-        return hashlib.sha256(password.encode()).hexdigest()
-        # .encode() convertit la string en bytes (nécessaire pour hashlib)
-        # .hexdigest() retourne le hash sous forme de string hexadécimale
+        from app import bcrypt
+        # Import ici pour éviter les imports circulaires au démarrage
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Vérifie si le mot de passe fourni correspond au hash stocké.
+
+        Retourne True si correct, False sinon.
+        Exemple: verify_password("secret") → True
+        """
+        from app import bcrypt
+        return bcrypt.check_password_hash(self.password, password)
+
+    # ------------------------------------------------------------------ #
+    #  Méthodes métier conservées de la Part 2                            #
+    # ------------------------------------------------------------------ #
 
     def register(self):
-        """Enregistre l'utilisateur en mettant à jour son crud_profile"""
+        """Enregistre l'utilisateur en mettant à jour son crud_profile."""
         self.crud_profile = "registered"
         self.save()
-        # save() met à jour updated_at
 
     def update_profile(self, data):
-        """Met à jour uniquement les champs autorisés du profil
-        
+        """Met à jour uniquement les champs autorisés du profil.
+
+        Si 'password' est fourni, il est re-hashé via hash_password().
         Exemple: user.update_profile({"first_name": "Jane"})
         """
         allowed = ['first_name', 'last_name', 'email']
-        # Liste blanche des champs modifiables
-        # password_hash et is_admin ne sont pas modifiables ici
-
         filtered = {k: v for k, v in data.items() if k in allowed}
-        # Dictionnaire en compréhension : ne garde que les clés autorisées
-        # ex: {"first_name": "Jane", "password": "hack"} → {"first_name": "Jane"}
-
         self.update(filtered)
-        # Appelle BaseModel.update() avec les données filtrées
+
+        # Le mot de passe passe par hash_password(), pas par update()
+        if 'password' in data:
+            self.hash_password(data['password'])
 
     def change_password(self, new_password):
-        """Change le mot de passe de l'utilisateur"""
+        """Change le mot de passe de l'utilisateur (re-hash bcrypt)."""
         if not new_password:
             raise ValueError("new password is required")
-        self.password_hash = self._hash_password(new_password)
-        # Hache le nouveau mot de passe avant de le stocker
+        self.hash_password(new_password)
         self.save()
 
     def delete(self):
-        """Marque l'utilisateur comme supprimé"""
+        """Marque l'utilisateur comme supprimé."""
         self.crud_profile = "deleted"
         self.save()
 
-    def authenticate(self, password):
-        """Vérifie si le mot de passe fourni est correct
-        
-        Retourne True si correct, False sinon
-        Exemple: user.authenticate("secret") → True
-        """
-        return self.password_hash == self._hash_password(password)
-        # On hache le mot de passe fourni et on compare avec le hash stocké
-        # On ne compare jamais en clair
+    # ------------------------------------------------------------------ #
+    #  Sérialisation                                                       #
+    # ------------------------------------------------------------------ #
 
     def to_dict(self):
-        """Surcharge to_dict() de BaseModel pour ajouter les attributs de User
-        
-        IMPORTANT: password_hash n'est jamais retourné pour des raisons de sécurité
+        """Surcharge to_dict() de BaseModel pour ajouter les attributs User.
+
+        IMPORTANT: self.password n'est JAMAIS retourné pour des raisons
+        de sécurité. Les endpoints GET ne doivent pas exposer le hash.
         """
         base = super().to_dict()
-        # Récupère le dict de base: id, created_at, updated_at
         base.update({
             'first_name': self.first_name,
-            'last_name': self.last_name,
-            'email': self.email,
-            'is_admin': self.is_admin
-            # password_hash volontairement absent
+            'last_name':  self.last_name,
+            'email':      self.email,
+            'is_admin':   self.is_admin,
+            # 'password' volontairement absent
         })
         return base
