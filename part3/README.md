@@ -71,31 +71,31 @@ HBnB Part 2 est une **API REST** qui simule le backend d'une plateforme de locat
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    CLIENT (curl / HTTP)                  │
+│                    CLIENT (curl / HTTP)                 │
 └──────────────────────────┬──────────────────────────────┘
                            │ HTTP Request
 ┌──────────────────────────▼──────────────────────────────┐
-│              COUCHE API  (app/api/v1/*.py)               │
-│   Flask-RESTX Namespaces • Validation entrée/sortie      │
-│   Swagger UI auto-généré à /doc                          │
+│              COUCHE API  (app/api/v1/*.py)              │
+│   Flask-RESTX Namespaces • Validation entrée/sortie     │
+│   Swagger UI auto-généré à /doc                         │
 └──────────────────────────┬──────────────────────────────┘
                            │ appelle
 ┌──────────────────────────▼──────────────────────────────┐
-│           COUCHE SERVICE  (app/services/facade.py)       │
-│   HBnBFacade • Logique métier • Résolution des IDs       │
-│   Interface unique entre API et données                  │
+│           COUCHE SERVICE  (app/services/facade.py)      │
+│   HBnBFacade • Logique métier • Résolution des IDs      │
+│   Interface unique entre API et données                 │
 └──────────────────────────┬──────────────────────────────┘
                            │ appelle
-┌──────────────────────────▼──────────────────────────────┐
+┌──────────────────────────▼────────────────────────────────┐
 │        COUCHE PERSISTANCE  (app/persistence/repository.py)│
-│   InMemoryRepository • CRUD générique                    │
-│   Stockage dict Python (en mémoire, reset au redémarrage)│
-└──────────────────────────┬──────────────────────────────┘
+│   InMemoryRepository • CRUD générique                     │
+│   Stockage dict Python (en mémoire, reset au redémarrage) │
+└──────────────────────────┬────────────────────────────────┘
                            │ retourne des objets
 ┌──────────────────────────▼──────────────────────────────┐
-│           COUCHE MODÈLES  (app/models/*.py)              │
-│   User • Place • Amenity • Review • BaseModel            │
-│   Validation des données • Sérialisation JSON            │
+│           COUCHE MODÈLES  (app/models/*.py)             │
+│   User • Place • Amenity • Review • BaseModel           │
+│   Validation des données • Sérialisation JSON           │
 └─────────────────────────────────────────────────────────┘
 ```
 
