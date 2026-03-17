@@ -1,3 +1,10 @@
+@api.route('/me')
+class UserMe(Resource):
+    @jwt_required()
+    def get(self):
+        """Return current user info from JWT token"""
+        identity = get_jwt()
+        return {'user': identity}, 200
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, jwt_required
 
