@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+HBnBvenv/
+.venv/
+env/
+venv/
+
+# Ignore site-packages and build artifacts
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Ignore log files
+*.log
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
