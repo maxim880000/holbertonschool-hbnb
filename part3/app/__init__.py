@@ -2,11 +2,13 @@ from flask import Flask
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 from app.config import config
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
+db = SQLAlchemy()
 
 
 def create_app(config_name='development'):
@@ -26,6 +28,7 @@ def create_app(config_name='development'):
     # extensions
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     # API setup
     api = Api(

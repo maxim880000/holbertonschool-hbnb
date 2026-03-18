@@ -5,6 +5,7 @@ from typing import Any
 from app.models.entities import Amenity, Place, Review, User
 
 from app.persistence.repository import InMemoryRepository
+from app.services.repositories.user_repository import UserRepository
 
 
 class HBnBFacade:
@@ -12,9 +13,9 @@ class HBnBFacade:
     # pour gérer les données. Interface entre les ressources API et les données.
 
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
+        self.user_repo    = UserRepository()
+        self.place_repo   = InMemoryRepository()
+        self.review_repo  = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
     # ------------------------------------------------------------------ Users
@@ -23,7 +24,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_user_by_email(email)
 
     def get_users(self):
         return self.user_repo.get_all()
