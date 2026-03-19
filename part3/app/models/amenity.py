@@ -50,3 +50,4 @@ class Amenity(BaseModel):
             'description': self.description
         })
         return base
+drbgergidsbgiumeigumeiugberiubgkierbgierbigeriubgiuerbgieiugbaeriumgniuerniudfiugeihgierniueriugerifumoerhiueriu
