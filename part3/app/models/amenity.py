@@ -1,9 +1,13 @@
+from app import db
 from app.models.base_model import BaseModel
 
+
 class Amenity(BaseModel):
-    # Amenity hérite de BaseModel
-    # Représente un équipement disponible dans un lieu
-    # ex: "Wi-Fi", "Parking", "Piscine"
+    __tablename__ = 'amenities'
+
+    # Colonnes SQLAlchemy
+    name        = db.Column(db.String(50),  nullable=False, unique=True)
+    description = db.Column(db.String(256), nullable=True)
 
     def __init__(self, name, description=""):
         super().__init__()
@@ -38,9 +42,6 @@ class Amenity(BaseModel):
         self.crud_profile = "deleted"
         self.save()
 
-    # ------------------------------------------------------------------ #
-    #  sérialisation                                                       #
-    # ------------------------------------------------------------------ #
     def to_dict(self):
         """Surcharge to_dict() pour ajouter les attributs de Amenity"""
         base = super().to_dict()
@@ -50,4 +51,3 @@ class Amenity(BaseModel):
             'description': self.description
         })
         return base
-drbgergidsbgiumeigumeiugberiubgkierbgierbigeriubgiuerbgieiugbaeriumgniuerniudfiugeihgierniueriugerifumoerhiueriu
