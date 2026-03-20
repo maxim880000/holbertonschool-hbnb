@@ -1,8 +1,18 @@
+from app import db
 from app.models.base_model import BaseModel
 
+
 class Place(BaseModel):
-    # Place hérite de BaseModel
-    # Représente un lieu disponible à la location
+    __tablename__ = 'places'
+
+    # Colonnes SQLAlchemy — pas de relations encore (Task 8)
+    title        = db.Column(db.String(100),  nullable=False)
+    description  = db.Column(db.String(1024), nullable=True)
+    price        = db.Column(db.Float,        nullable=False)
+    latitude     = db.Column(db.Float,        nullable=False)
+    longitude    = db.Column(db.Float,        nullable=False)
+    max_guests   = db.Column(db.Integer,      default=1)
+    is_available = db.Column(db.Boolean,      default=True)
 
     def __init__(self, title, description, price, latitude,
                 longitude, owner, max_guests=1, is_available=True):
@@ -129,8 +139,6 @@ class Place(BaseModel):
         # sum() additionne tous les ratings
         # len() compte le nombre de reviews
         # ex: sum([5,4,3]) / 3 = 4.0
-
-    # ── Sérialisation ────────────────────────────────────────────────────────
 
     def to_dict(self):
         """Surcharge to_dict() pour ajouter les attributs de Place"""

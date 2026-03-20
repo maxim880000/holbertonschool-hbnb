@@ -1,8 +1,13 @@
+from app import db
 from app.models.base_model import BaseModel
 
+
 class Review(BaseModel):
-    # Review hérite de BaseModel
-    # Représente un avis laissé par un User sur un Place
+    __tablename__ = 'reviews'
+
+    # Colonnes SQLAlchemy — pas de FK encore (Task 8)
+    text   = db.Column(db.String(2048), nullable=False)
+    rating = db.Column(db.Integer,      nullable=False)
 
     def __init__(self, rating, comment, place, user):
         super().__init__()
@@ -30,8 +35,10 @@ class Review(BaseModel):
         self.rating = rating
         # Entier entre 1 et 5
 
+        self.text = comment
+        # Colonne SQLAlchemy nommée 'text' selon la consigne
         self.comment = comment
-        # Texte libre de l'avis
+        # Alias gardé pour compatibilité avec le reste du code
 
         self.place = place
         # Instance de Place (relation entre entités)
@@ -57,6 +64,10 @@ class Review(BaseModel):
             self.validate_rating(filtered['rating'])
             # On valide le nouveau rating avant de l'appliquer
 
+        # renommer comment → text pour la colonne SQLAlchemy
+        if 'comment' in filtered:
+            filtered['text'] = filtered.pop('comment')
+
         super().update(filtered)
         # Appelle BaseModel.update() avec les données filtrées
 
@@ -79,7 +90,8 @@ class Review(BaseModel):
         base = super().to_dict()
         base.update({
             'rating': self.rating,
-            'comment': self.comment,
+            'comment': self.text,
+            # On retourne sous la clé 'comment' pour compatibilité API
             'place_id': self.place.id,
             # On retourne l'id du place, pas l'objet entier
             'user_id': self.user.id
