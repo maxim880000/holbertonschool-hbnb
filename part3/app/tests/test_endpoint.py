@@ -14,7 +14,11 @@ class BaseTestCase(unittest.TestCase):
     """Shared setUp: one fresh app + test client per test method."""
 
     def setUp(self):
-        self.app = create_app()
+        self.app = create_app('testing')
+        self.ctx = self.app.app_context()
+        self.ctx.push()
+        from app import db
+        db.create_all()
         self.client = self.app.test_client()
 
         # Ensure we have an admin user to authenticate requests that require it
@@ -32,6 +36,9 @@ class BaseTestCase(unittest.TestCase):
             pass
 
         self.auth_headers = self._login(self.admin_email, self.admin_password)
+
+    def tearDown(self):
+        self.ctx.pop()
 
     # ------------------------------------------------------------------
     # Helpers
@@ -349,8 +356,11 @@ class TestReviewEndpoints(BaseTestCase):
         self.assertEqual(resp.status_code, 404)
 
     def test_get_reviews_by_place(self):
+        reviewer2_id = self._create_user(
+            email=_unique_email('reviewer2'), first='Carol', last='Lee'
+        ).get_json()['id']
         self._create_review(self.reviewer_id, self.place_id, comment='A')
-        self._create_review(self.reviewer_id, self.place_id,
+        self._create_review(reviewer2_id, self.place_id,
                             rating=5, comment='B')
         resp = self.client.get(f'/api/v1/reviews/places/{self.place_id}/reviews')
         self.assertEqual(resp.status_code, 200)

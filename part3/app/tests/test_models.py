@@ -1,10 +1,17 @@
-"""Unit tests for model validation logic (no network / no Flask required)."""
+"""Unit tests for model validation logic."""
 import unittest
 
+from app import create_app
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
+
+_app = create_app('testing')
+_ctx = _app.app_context()
+_ctx.push()
+from app import db as _db
+_db.create_all()
 
 
 # ---------------------------------------------------------------------------

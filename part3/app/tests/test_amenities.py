@@ -7,6 +7,10 @@ from app.services import facade
 class AmenitiesAPITestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app("testing")
+        self.ctx = self.app.app_context()
+        self.ctx.push()
+        from app import db
+        db.create_all()
         self.client = self.app.test_client()
 
         # Ensure an admin user exists for protected endpoints
@@ -52,6 +56,9 @@ class AmenitiesAPITestCase(unittest.TestCase):
         self.assertEqual(resp_user.status_code, 200)
         user_token = resp_user.get_json()['access_token']
         self.user_headers = {'Authorization': f'Bearer {user_token}'}
+
+    def tearDown(self):
+        self.ctx.pop()
 
     def test_amenity_crud_flow(self):
         resp = self.client.post('/api/v1/amenities/', json={'name': 'Wi-Fi'}, headers=self.headers)

@@ -165,3 +165,27 @@ class PlaceResource(Resource):
             return {'message': 'Place not found'}, 404
 
         return {'message': 'Place updated successfully'}, 200
+
+    @jwt_required()
+    @api.response(200, 'Place deleted successfully')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Place not found')
+    def delete(self, place_id):
+        """Delete a place"""
+        current = get_jwt()
+        is_admin = current.get('is_admin', False)
+        user_id = get_jwt_identity()
+
+        try:
+            place = facade.get_place(place_id)
+        except NotImplementedError:
+            return {'error': 'Place retrieval not implemented'}, 501
+
+        if not place:
+            return {'message': 'Place not found'}, 404
+
+        if not is_admin and place.owner.id != user_id:
+            return {'error': 'Unauthorized action'}, 403
+
+        facade.place_repo.delete(place_id)
+        return {'message': 'Place deleted successfully'}, 200

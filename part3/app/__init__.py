@@ -2,11 +2,13 @@ from flask import Flask
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 from app.config import config
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
+db = SQLAlchemy()
 
 
 def create_app(config_name='development'):
@@ -26,14 +28,25 @@ def create_app(config_name='development'):
     # extensions
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     # API setup
+    authorizations = {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'Entrez: Bearer <votre_token>',
+        }
+    }
     api = Api(
         app,
         version='1.0',
         title='HBnB API',
         description='HBnB Application API',
-        doc='/doc',  # Swagger UI séparé du préfixe API
+        doc='/doc',
+        authorizations=authorizations,
+        security='Bearer',
     )
 
     # register namespaces (lazy imports to avoid circulars)
@@ -48,5 +61,8 @@ def create_app(config_name='development'):
 
     from app.api.v1.reviews import api as reviews_ns
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
+
+    with app.app_context():
+        db.create_all()
 
     return app

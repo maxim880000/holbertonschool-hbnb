@@ -1,10 +1,3 @@
-@api.route('/me')
-class UserMe(Resource):
-    @jwt_required()
-    def get(self):
-        """Return current user info from JWT token"""
-        identity = get_jwt()
-        return {'user': identity}, 200
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, jwt_required
 
@@ -12,8 +5,6 @@ from app.services import facade
 
 api = Namespace('users', description='Operations on users')
 
-# Modèle de réponse — password volontairement ABSENT
-# to_dict() ne le retourne pas, et on ne le déclare pas ici non plus
 user_model = api.model('User', {
     'id':         fields.String(readonly=True, description='User unique identifier'),
     'email':      fields.String(required=True, description='User email'),
@@ -24,7 +15,6 @@ user_model = api.model('User', {
     'updated_at': fields.String(readonly=True),
 })
 
-# Modèle de création — password requis, sera hashé par bcrypt côté modèle
 create_user_model = api.model('UserCreate', {
     'email':      fields.String(required=True),
     'password':   fields.String(required=True, description='Plain-text, sera hashé avant stockage'),
@@ -32,10 +22,16 @@ create_user_model = api.model('UserCreate', {
     'last_name':  fields.String(required=True),
 })
 
-# Modèle de mise à jour — password optionnel, sera re-hashé si fourni
 update_user_model = api.model('UserUpdate', {
     'first_name': fields.String(),
     'last_name':  fields.String(),
+    'password':   fields.String(description='Nouveau mot de passe, sera hashé avant stockage'),
+})
+
+admin_update_user_model = api.model('AdminUserUpdate', {
+    'first_name': fields.String(),
+    'last_name':  fields.String(),
+    'email':      fields.String(),
     'password':   fields.String(description='Nouveau mot de passe, sera hashé avant stockage'),
 })
 
@@ -43,6 +39,15 @@ login_model = api.model('UserLogin', {
     'email':    fields.String(required=True),
     'password': fields.String(required=True),
 })
+
+
+@api.route('/me')
+class UserMe(Resource):
+    @jwt_required()
+    def get(self):
+        """Return current user info from JWT token"""
+        identity = get_jwt()
+        return {'user': identity}, 200
 
 
 @api.route('/')
@@ -66,13 +71,11 @@ class UserList(Resource):
         is_admin = current.get('is_admin', False)
 
         data = api.payload or {}
-        # First user can bootstrap the system as an admin
         if not facade.get_users():
             data['is_admin'] = True
         else:
             if not is_admin:
                 return {'error': 'Admin privileges required'}, 403
-            # Admin can explicitly set is_admin flag; default to False if not provided
             data.setdefault('is_admin', False)
 
         try:
@@ -82,7 +85,6 @@ class UserList(Resource):
             if 'in use' in msg:
                 return {'message': msg}, 409
             return {'message': msg}, 400
-        # to_dict() n'inclut pas le password — réponse sécurisée
         return user.to_dict(), 201
 
 
@@ -118,7 +120,6 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             api.abort(404, 'User not found')
-        # to_dict() n'inclut pas le password — jamais exposé en GET
         return user.to_dict(), 200
 
     @jwt_required()
@@ -133,7 +134,6 @@ class UserResource(Resource):
             return {'error': 'Admin privileges required'}, 403
 
         data = api.payload or {}
-        # Ensure updated email stays unique
         if 'email' in data:
             existing = facade.get_user_by_email(data['email'])
             if existing and existing.id != user_id:
@@ -142,10 +142,7 @@ class UserResource(Resource):
         try:
             user = facade.update_user(user_id, data)
         except ValueError as e:
-            msg = str(e)
-            if 'in use' in msg:
-                return {'error': msg}, 400
-            return {'error': msg}, 400
+            return {'error': str(e)}, 400
         if not user:
             api.abort(404, 'User not found')
         return user.to_dict(), 200

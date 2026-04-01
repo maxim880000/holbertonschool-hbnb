@@ -1,8 +1,55 @@
+from app import db
 from app.models.base_model import BaseModel
 
+# Table d'association many-to-many entre Place et Amenity
+# Doit être définie AVANT les classes qui l'utilisent
+place_amenity = db.Table(
+    'place_amenity',
+    db.Column('place_id',   db.String(36), db.ForeignKey('places.id'),   primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+    # Clé primaire composite : une paire (place, amenity) est unique
+)
+
+
 class Place(BaseModel):
-    # Place hérite de BaseModel
-    # Représente un lieu disponible à la location
+    __tablename__ = 'places'
+
+    # Colonnes SQLAlchemy
+    title        = db.Column(db.String(100),  nullable=False)
+    description  = db.Column(db.String(1024), nullable=True)
+    price        = db.Column(db.Float,        nullable=False)
+    latitude     = db.Column(db.Float,        nullable=False)
+    longitude    = db.Column(db.Float,        nullable=False)
+    max_guests   = db.Column(db.Integer,      default=1)
+    is_available = db.Column(db.Boolean,      default=True)
+
+    # Clé étrangère vers User — Task 8
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    # Chaque place appartient à un seul user (many-to-one)
+
+    # Relations SQLAlchemy — Task 8
+    owner = db.relationship(
+        'User',
+        backref=db.backref('places', lazy=True)
+        # backref crée automatiquement user.places pour accéder
+        # à tous les places d'un user depuis l'objet User
+    )
+
+    amenities = db.relationship(
+        'Amenity',
+        secondary=place_amenity,
+        lazy='subquery',
+        backref=db.backref('places', lazy=True)
+        # secondary pointe vers la table d'association
+        # backref crée amenity.places pour l'accès inverse
+    )
+
+    reviews = db.relationship(
+        'Review',
+        backref=db.backref('place', lazy=True),
+        lazy=True
+        # backref crée review.place pour accéder au place depuis une review
+    )
 
     def __init__(self, title, description, price, latitude,
                 longitude, owner, max_guests=1, is_available=True):
@@ -41,19 +88,13 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
-        # owner est une instance de User (relation entre entités)
+        # owner est une instance de User (relation SQLAlchemy)
+        self.owner_id = owner.id
+        # owner_id est la FK stockée en base
 
         self.max_guests = max_guests
         self.is_available = is_available
         # True par défaut : le lieu est disponible à la création
-
-        self.reviews = []
-        # Liste vide pour stocker les instances de Review associées
-        # Relation one-to-many : un Place peut avoir plusieurs Reviews
-
-        self.amenities = []
-        # Liste vide pour stocker les instances de Amenity associées
-        # Relation many-to-many : un Place peut avoir plusieurs Amenities
 
     def create(self):
         """Marque le lieu comme créé"""
@@ -130,8 +171,6 @@ class Place(BaseModel):
         # len() compte le nombre de reviews
         # ex: sum([5,4,3]) / 3 = 4.0
 
-    # ── Sérialisation ────────────────────────────────────────────────────────
-
     def to_dict(self):
         """Surcharge to_dict() pour ajouter les attributs de Place"""
         base = super().to_dict()
@@ -144,7 +183,7 @@ class Place(BaseModel):
             'longitude': self.longitude,
             'max_guests': self.max_guests,
             'is_available': self.is_available,
-            'owner_id': self.owner.id,
+            'owner_id': self.owner_id,
             # On retourne l'id du owner, pas l'objet entier
             # Evite la récursion infinie dans la sérialisation JSON
             'amenities': [a.id for a in self.amenities],

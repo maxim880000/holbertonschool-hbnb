@@ -1,8 +1,28 @@
+from app import db
 from app.models.base_model import BaseModel
 
+
 class Review(BaseModel):
-    # Review hérite de BaseModel
-    # Représente un avis laissé par un User sur un Place
+    __tablename__ = 'reviews'
+
+    # Colonnes SQLAlchemy
+    text   = db.Column(db.String(2048), nullable=False)
+    rating = db.Column(db.Integer,      nullable=False)
+
+    # Clés étrangères — Task 8
+    user_id  = db.Column(db.String(36), db.ForeignKey('users.id'),  nullable=False)
+    # Chaque review est écrite par un seul user
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    # Chaque review concerne un seul place
+
+    # Relations SQLAlchemy — Task 8
+    user = db.relationship(
+        'User',
+        backref=db.backref('reviews', lazy=True)
+        # backref crée user.reviews pour accéder à toutes les
+        # reviews d'un user depuis l'objet User
+    )
+    # Note : la relation 'place' est gérée via backref dans Place.reviews
 
     def __init__(self, rating, comment, place, user):
         super().__init__()
@@ -30,14 +50,18 @@ class Review(BaseModel):
         self.rating = rating
         # Entier entre 1 et 5
 
+        self.text = comment
+        # Colonne SQLAlchemy nommée 'text' selon la consigne
         self.comment = comment
-        # Texte libre de l'avis
+        # Alias gardé pour compatibilité avec le reste du code
 
-        self.place = place
-        # Instance de Place (relation entre entités)
+        self.place    = place
+        self.place_id = place.id
+        # place est l'objet, place_id est la FK stockée en base
 
-        self.user = user
-        # Instance de User (relation entre entités)
+        self.user    = user
+        self.user_id = user.id
+        # user est l'objet, user_id est la FK stockée en base
 
     def create(self):
         """Crée la review et l'associe automatiquement au lieu"""
@@ -56,6 +80,10 @@ class Review(BaseModel):
         if 'rating' in filtered:
             self.validate_rating(filtered['rating'])
             # On valide le nouveau rating avant de l'appliquer
+
+        # renommer comment → text pour la colonne SQLAlchemy
+        if 'comment' in filtered:
+            filtered['text'] = filtered.pop('comment')
 
         super().update(filtered)
         # Appelle BaseModel.update() avec les données filtrées
@@ -79,10 +107,11 @@ class Review(BaseModel):
         base = super().to_dict()
         base.update({
             'rating': self.rating,
-            'comment': self.comment,
-            'place_id': self.place.id,
+            'comment': self.text,
+            # On retourne sous la clé 'comment' pour compatibilité API
+            'place_id': self.place_id,
             # On retourne l'id du place, pas l'objet entier
-            'user_id': self.user.id
+            'user_id': self.user_id
             # On retourne l'id du user, pas l'objet entier
         })
         return base

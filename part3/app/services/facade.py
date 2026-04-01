@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.models.entities import Amenity, Place, Review, User
-
 from app.persistence.repository import InMemoryRepository
+from app.services.repositories.user_repository import UserRepository
 
 
 class HBnBFacade:
@@ -12,9 +11,9 @@ class HBnBFacade:
     # pour gérer les données. Interface entre les ressources API et les données.
 
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
+        self.user_repo    = UserRepository()
+        self.place_repo   = InMemoryRepository()
+        self.review_repo  = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
     # ------------------------------------------------------------------ Users
@@ -23,7 +22,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_user_by_email(email)
 
     def get_users(self):
         return self.user_repo.get_all()
@@ -154,6 +153,14 @@ class HBnBFacade:
         place = self.get_place(place_id)
         if not place:
             raise ValueError('place not found')
+
+        if place.owner.id == user_id:
+            raise ValueError('You cannot review your own place')
+
+        existing = [r for r in self.review_repo.get_all()
+                    if r.user.id == user_id and r.place.id == place_id]
+        if existing:
+            raise ValueError('You have already reviewed this place')
 
         from app.models.review import Review
         review = Review(

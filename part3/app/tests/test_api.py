@@ -8,7 +8,11 @@ class UsersAPITestCase(unittest.TestCase):
     """Tests for user endpoints with admin-based access control."""
 
     def setUp(self):
-        self.app = create_app()
+        self.app = create_app('testing')
+        self.ctx = self.app.app_context()
+        self.ctx.push()
+        from app import db
+        db.create_all()
         self.client = self.app.test_client()
 
         # Ensure we have an admin user for protected actions
@@ -32,6 +36,9 @@ class UsersAPITestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         token = resp.get_json()['access_token']
         self.headers = {'Authorization': f'Bearer {token}'}
+
+    def tearDown(self):
+        self.ctx.pop()
 
     def test_user_crud_flow(self):
         # create a new user
