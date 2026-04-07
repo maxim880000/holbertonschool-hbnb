@@ -3,12 +3,9 @@
   Client-side scripts
 */
 
-const API_URL = 'http://127.0.0.1:5000';
-
 document.addEventListener('DOMContentLoaded', () => {
-
-    /* ── Login page ─────────────────────────────────────────────────── */
     const loginForm = document.getElementById('login-form');
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -18,14 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ── Index page ─────────────────────────────────────────────────── */
     const priceFilter = document.getElementById('price-filter');
     if (priceFilter) {
         checkAuthentication();
 
         priceFilter.addEventListener('change', (event) => {
             const selected = event.target.value;
-            document.querySelectorAll('.place-card').forEach((card) => {
+            const places = document.querySelectorAll('.place-card');
+            places.forEach((card) => {
                 if (selected === 'all') {
                     card.style.display = 'block';
                 } else {

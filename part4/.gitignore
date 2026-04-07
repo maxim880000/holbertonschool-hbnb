@@ -1,0 +1,42 @@
+# Python bytecode
+*.pyc
+__pycache__/
+
+# Virtual environments
+HBnBvenv/
+venv/
+.env/
+.venv/
+
+# VS Code settings
+.vscode/
+
+# Test reports and logs
+*.log
+*.tmp
+*.md~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore not-critical files
+curl_commands.txt
+curl_tests.sh
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore notebooks
+*.ipynb
+
+# Ignore backups
+*~
+
+# Ignore SQL scripts (if not critical)
+hbnb_schema.sql
+
+# Ignore other not-critical files
+# Add more patterns as needed
