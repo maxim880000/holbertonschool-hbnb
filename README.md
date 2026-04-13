@@ -1,7 +1,7 @@
 # HBnB — Holberton AirBnB Clone
 
-Projet backend RESTful développé en Python/Flask dans le cadre du cursus Holberton School.
-Reproduction partielle d'AirBnB : gestion des utilisateurs, lieux, équipements et avis, avec authentification JWT et persistence SQLAlchemy.
+Projet full-stack développé en Python/Flask (backend) et HTML5/CSS3/JavaScript ES6 (frontend) dans le cadre du cursus Holberton School.
+Reproduction partielle d'AirBnB : gestion des utilisateurs, lieux, équipements et avis, avec authentification JWT, persistence SQLAlchemy et interface web dynamique.
 
 ---
 
@@ -23,6 +23,7 @@ Reproduction partielle d'AirBnB : gestion des utilisateurs, lieux, équipements 
 14. [Démarrage rapide](#14-démarrage-rapide)
 15. [Variables d'environnement](#15-variables-denvironnement)
 16. [Évolution par partie](#16-évolution-par-partie)
+17. [Part 4 — Interface web (Simple Web Client)](#17-part-4--interface-web-simple-web-client)
 
 ---
 
@@ -995,3 +996,85 @@ User ──────────────── Place
 - Un **Place** peut avoir plusieurs **Reviews**
 - Un **Place** peut avoir plusieurs **Amenities** (et vice-versa)
 - Une **Review** appartient à exactement un **User** et un **Place**
+
+---
+
+## 17. Part 4 — Interface web (Simple Web Client)
+
+### Objectif
+
+Développement d'une interface web dynamique en HTML5/CSS3/JavaScript ES6 connectée à l'API Flask (Part 3).
+
+### Pages
+
+| Page | Fichier | Description |
+|------|---------|-------------|
+| Liste des lieux | `index.html` | Affiche toutes les places avec filtre par prix |
+| Connexion | `login.html` | Formulaire d'authentification JWT |
+| Détails d'un lieu | `place.html` | Informations complètes + avis + amenities |
+| Ajouter un avis | `add_review.html` | Formulaire réservé aux utilisateurs connectés |
+
+### Fonctionnalités implémentées
+
+**Task 1 — Design**
+- Header avec logo SVG (`logo.svg`) et bouton Login
+- Footer "All rights reserved"
+- Cartes de lieux : `place-card`, `details-button`
+- Détails : `place-details`, `place-info`
+- Avis : `review-card` avec nom, note étoiles et commentaire
+- Formulaires stylisés : `form-container`, `form-group`
+- Images des amenities : `wifi.png`, `bed.png`, `shower.png`
+- Images des lieux : `image.png`, `image copy.png` (alternées)
+
+**Task 2 — Login**
+- POST `/api/v1/users/login` avec email + password
+- Stockage du JWT dans un cookie (`token=...`)
+- Redirection vers `index.html` après succès
+- Message d'erreur en cas d'échec
+
+**Task 3 — Liste des lieux**
+- Vérification du cookie JWT au chargement
+- Affichage / masquage du lien Login selon l'état de connexion
+- Fetch `GET /api/v1/places/` avec header `Authorization: Bearer <token>`
+- Fetch détaillé par ID pour récupérer le prix
+- Filtre client-side par prix max (10 / 50 / 100 / All) sans rechargement
+
+**Task 4 — Détails d'un lieu**
+- Extraction de l'ID via `?id=` dans l'URL
+- Fetch `GET /api/v1/places/:id`
+- Affichage : hôte, prix, localisation, description, amenities avec icônes
+- Fetch des avis `GET /api/v1/reviews/places/:id/reviews`
+- Bouton "Write a Review" visible uniquement si connecté
+
+**Task 5 — Formulaire d'avis**
+- Redirection vers `index.html` si non connecté
+- POST `/api/v1/reviews/` avec `comment`, `rating`, `place_id`, `user_id` (extrait du JWT)
+- Message de succès + reset du formulaire + redirection automatique
+
+### Structure des fichiers
+
+```
+part4/bases_files/
+├── index.html          ← Liste des lieux
+├── login.html          ← Connexion
+├── place.html          ← Détails d'un lieu
+├── add_review.html     ← Ajouter un avis
+├── styles.css          ← Styles globaux
+├── scripts.js          ← Logique JS (tasks 1-5)
+└── images/
+    ├── logo.svg        ← Logo de l'application
+    ├── icon.svg        ← Favicon
+    ├── image.png       ← Image par défaut des lieux (pair)
+    ├── image copy.png  ← Image par défaut des lieux (impair)
+    ├── wifi.png        ← Icône amenity WiFi
+    ├── bed.png         ← Icône amenity Chambre/Lit
+    └── shower.png      ← Icône amenity Salle de bain
+```
+
+### Démarrage
+
+1. Lancer l'API Flask (Part 3) sur `http://localhost:5000`
+2. Ouvrir `index.html` dans un navigateur (ou via un serveur local)
+3. Se connecter via `login.html` pour accéder aux fonctionnalités complètes
+
+> **Note CORS :** L'API Flask doit autoriser les requêtes cross-origin. Ajouter `flask-cors` et configurer `CORS(app)` dans `app/__init__.py`.

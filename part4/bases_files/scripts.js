@@ -39,6 +39,20 @@ function renderStars(rating) {
 }
 
 /* =========================================
+   Amenity icon helper — maps name to image
+   ========================================= */
+
+const PLACE_IMAGES = ['images/image.png', 'images/image copy.png'];
+
+function getAmenityIcon(name) {
+    const n = name.toLowerCase();
+    if (n.includes('wifi') || n.includes('wi-fi') || n.includes('internet')) return 'images/wifi.png';
+    if (n.includes('shower') || n.includes('bath')) return 'images/shower.png';
+    if (n.includes('bed') || n.includes('room') || n.includes('sleep')) return 'images/bed.png';
+    return null;
+}
+
+/* =========================================
    URL query param helper
    ========================================= */
 
@@ -160,14 +174,16 @@ function displayPlaces(places) {
         return;
     }
 
-    places.forEach((place) => {
+    places.forEach((place, index) => {
         const div = document.createElement('div');
         div.className = 'place-card';
         div.dataset.price = place.price || 0;
 
         const price = place.price !== undefined ? `$${place.price}/night` : 'Price on request';
+        const img = PLACE_IMAGES[index % PLACE_IMAGES.length];
 
         div.innerHTML = `
+            <img src="${img}" alt="${escapeHtml(place.title)}" class="place-img">
             <h3>${escapeHtml(place.title)}</h3>
             <p class="price">${price}</p>
             <a href="place.html?id=${place.id}" class="details-button">View Details</a>
@@ -233,9 +249,13 @@ async function fetchPlaceDetails(placeId, token) {
         const place = await response.json();
 
         const amenitiesHtml = place.amenities && place.amenities.length > 0
-            ? `<div class="amenities-list">${place.amenities.map((a) =>
-                `<span class="amenity-tag">${escapeHtml(a.name)}</span>`
-              ).join('')}</div>`
+            ? `<div class="amenities-list">${place.amenities.map((a) => {
+                const icon = getAmenityIcon(a.name);
+                const iconHtml = icon
+                    ? `<img src="${icon}" alt="" class="amenity-icon">`
+                    : '';
+                return `<span class="amenity-tag">${iconHtml}${escapeHtml(a.name)}</span>`;
+              }).join('')}</div>`
             : '<p>No amenities listed.</p>';
 
         const ownerName = place.owner
