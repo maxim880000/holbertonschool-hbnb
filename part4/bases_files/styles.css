@@ -1,547 +1,440 @@
-/* =========================================
-   HBnB - Global Styles
-   ========================================= */
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --primary: #ff5a5f;
-    --primary-dark: #e04a4f;
-    --secondary: #00a699;
-    --bg: #f7f7f7;
-    --white: #ffffff;
-    --text: #333333;
-    --text-light: #767676;
-    --border: #dddddd;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    --radius: 10px;
-}
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* =========================================
-   Header
-   ========================================= */
+a { color: inherit; text-decoration: none; }
 
+/* ── Header ── */
 header {
-    background-color: var(--white);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    height: 64px;
+    background: #ff5a5f;
+    padding: 16px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.logo {
-    height: 40px;
+header .logo {
+    height: 50px;
     width: auto;
 }
 
-nav {
+header nav {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 20px;
 }
 
-nav a {
-    color: var(--text);
+header nav a {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background 0.3s, transform 0.2s;
 }
 
-nav a:hover {
-    color: var(--primary);
+header nav a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+#user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#user-name {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
 }
 
 .login-button {
-    background-color: var(--primary);
-    color: var(--white) !important;
-    padding: 0.5rem 1.25rem;
-    border-radius: 4px;
-    font-weight: 600;
-    transition: background-color 0.2s !important;
+    background: #fff;
+    color: #ff5a5f !important;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: inline-block;
 }
 
 .login-button:hover {
-    background-color: var(--primary-dark) !important;
-    color: var(--white) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-/* =========================================
-   Main content
-   ========================================= */
-
+/* ── Main ── */
 main {
     flex: 1;
-    padding: 2rem;
-    max-width: 1200px;
+    padding: 30px;
+    max-width: 1400px;
     width: 100%;
     margin: 0 auto;
 }
 
-h1, h2, h3 {
-    margin-bottom: 1rem;
-    color: var(--text);
-}
-
-/* =========================================
-   Filter Section
-   ========================================= */
-
-.filter-section {
-    background-color: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
+/* ── Filter Section ── */
+#filter {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 12px;
 }
 
-.filter-section label {
+#filter label {
     font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
+    font-size: 16px;
+    color: #222;
 }
 
-.filter-section select {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 1rem;
-    background-color: var(--white);
+#filter select {
+    padding: 10px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
     cursor: pointer;
-    outline: none;
     transition: border-color 0.2s;
 }
 
-.filter-section select:focus {
-    border-color: var(--primary);
+#filter select:hover,
+#filter select:focus {
+    border-color: #ff5a5f;
+    outline: none;
 }
 
-/* =========================================
-   Place Cards (index.html)
-   ========================================= */
-
+/* ── Place Cards (index) ── */
 #places-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
 }
 
 .place-card {
-    background-color: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px;
-    margin: 20px 0;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    cursor: pointer;
+    margin: 20px 0;
+    padding: 10px;
 }
 
 .place-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 90, 95, 0.15);
 }
 
-.place-card .place-img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 6px;
-    margin-bottom: 0.25rem;
+.place-card h2 {
+    font-size: 19px;
+    color: #222;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-.place-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0;
-    color: var(--text);
+.place-card p {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 8px;
 }
 
-.place-card .price {
-    color: var(--primary);
+.place-card p strong {
+    color: #ff5a5f;
+    font-size: 18px;
     font-weight: 700;
-    font-size: 1rem;
-}
-
-.place-card .location {
-    color: var(--text-light);
-    font-size: 0.875rem;
 }
 
 .details-button {
     display: inline-block;
-    margin-top: 0.5rem;
-    background-color: var(--primary);
-    color: var(--white);
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-align: center;
+    background: #ff5a5f;
+    color: #fff !important;
     border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
-    align-self: flex-start;
+    text-align: center;
+    margin-top: auto;
+    transition: background 0.3s;
+    text-decoration: none;
 }
 
 .details-button:hover {
-    background-color: var(--primary-dark);
+    background: #e04e53;
 }
 
-/* =========================================
-   Place Details (place.html)
-   ========================================= */
+/* ── Footer ── */
+footer {
+    background: #333;
+    color: #ccc;
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+    margin-top: 40px;
+}
 
+/* ── Place Details ── */
 .place-details {
-    background-color: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
     margin: 20px 0;
-    box-shadow: var(--shadow);
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.place-details h1 {
-    font-size: 1.75rem;
-    margin-bottom: 0.5rem;
+.place-details h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #222;
 }
 
 .place-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin: 1rem 0;
-    padding: 1rem 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 15px;
+    margin-bottom: 12px;
 }
 
-.place-info p {
-    color: var(--text);
-    font-size: 0.95rem;
-}
-
-.place-info strong {
-    display: block;
-    color: var(--text-light);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
-}
-
-.place-description {
-    margin: 1rem 0;
-    line-height: 1.6;
-    color: var(--text);
-}
+.place-info span { color: #555; }
+.place-info strong { color: #222; }
 
 .amenities-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 8px;
+    margin-top: 8px;
 }
 
 .amenity-tag {
-    background-color: var(--bg);
-    border: 1px solid var(--border);
+    background: #fff3f3;
+    color: #ff5a5f;
+    border: 1px solid #ffb3b5;
     border-radius: 20px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
-    color: var(--text);
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 4px;
 }
 
-.amenity-icon {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-}
-
-/* =========================================
-   Reviews Section
-   ========================================= */
-
+/* ── Reviews Section ── */
 #reviews {
-    margin-top: 2rem;
+    margin: 20px 0;
 }
 
-#reviews h2 {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--primary);
+#reviews h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
 }
 
 .review-card {
-    background-color: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px;
+    background: #fff;
     margin: 20px 0;
-    box-shadow: var(--shadow);
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.review-card .reviewer-name {
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.25rem;
+.review-card .reviewer {
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
 .review-card .rating {
-    color: #f4c542;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+    color: #ff5a5f;
+    font-size: 18px;
+    margin-bottom: 4px;
 }
 
 .review-card .comment {
-    color: var(--text);
-    line-height: 1.5;
-    font-style: italic;
+    font-size: 14px;
+    color: #555;
 }
 
-/* =========================================
-   Add Review Button
-   ========================================= */
-
-.add-review-btn {
-    display: inline-block;
-    margin-top: 1rem;
-    background-color: var(--secondary);
-    color: var(--white);
-    padding: 0.6rem 1.25rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background-color 0.2s;
-}
-
-.add-review-btn:hover {
-    background-color: #008a7e;
-}
-
-/* =========================================
-   Forms (login.html / add_review.html)
-   ========================================= */
-
-.form-container {
-    max-width: 480px;
-    margin: 3rem auto;
-    background-color: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    box-shadow: var(--shadow);
-}
-
-.form-container h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    color: var(--primary);
-}
-
+/* ── Add Review ── */
 .add-review {
-    margin-top: 2rem;
-    background-color: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 20px 0;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.add-review h2 {
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--secondary);
+.add-review h2,
+.add-review h3 {
+    font-size: 18px;
+    margin-bottom: 14px;
+    color: #222;
 }
 
-.form-group {
-    margin-bottom: 1.25rem;
+.add-review .form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.4rem;
+.add-review .form label {
     font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text);
+    font-size: 14px;
+    color: #333;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
+.add-review .form textarea,
+.add-review .form select,
+.add-review .form input {
     width: 100%;
-    padding: 0.65rem 0.85rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 1rem;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
     font-family: inherit;
-    background-color: var(--white);
+    resize: vertical;
     transition: border-color 0.2s;
+}
+
+.add-review .form textarea:focus,
+.add-review .form select:focus {
+    border-color: #ff5a5f;
     outline: none;
 }
 
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(255, 90, 95, 0.15);
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.submit-button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: var(--primary);
-    color: var(--white);
+.add-review .form button {
+    background: #ff5a5f;
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    font-size: 1rem;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.2s;
+}
+
+.add-review .form button:hover { background: #e04e53; }
+
+/* ── Login Form ── */
+.login-container {
+    max-width: 420px;
+    margin: 60px auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #222;
+}
+
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.login-container label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.login-container input:focus {
+    border-color: #ff5a5f;
+    outline: none;
+}
+
+.login-container button {
+    background: #ff5a5f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background 0.2s;
 }
 
-.submit-button:hover {
-    background-color: var(--primary-dark);
-}
+.login-container button:hover { background: #e04e53; }
 
-/* =========================================
-   Messages (error / success)
-   ========================================= */
-
-.message {
-    padding: 0.75rem 1rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    display: none;
-}
-
-.message.error {
-    background-color: #fde8e8;
-    color: #c0392b;
-    border: 1px solid #f5c6cb;
-    display: block;
-}
-
-.message.success {
-    background-color: #e8f8f5;
-    color: #1a6b5a;
-    border: 1px solid #b2dfdb;
-    display: block;
-}
-
-/* =========================================
-   Loading / Empty states
-   ========================================= */
-
-.loading {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-light);
-    font-size: 1.1rem;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-light);
-}
-
-/* =========================================
-   Footer
-   ========================================= */
-
-footer {
-    background-color: var(--white);
-    border-top: 1px solid var(--border);
-    padding: 1.5rem 2rem;
-    text-align: center;
-    color: var(--text-light);
-    font-size: 0.875rem;
-    margin-top: auto;
-}
-
-/* =========================================
-   Back link
-   ========================================= */
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
-
-/* =========================================
-   Responsive
-   ========================================= */
-
+/* ── Responsive ── */
 @media (max-width: 768px) {
-    header {
-        padding: 0 1rem;
-    }
-
-    main {
-        padding: 1rem;
-    }
-
     #places-list {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
     }
 
-    .place-info {
-        grid-template-columns: 1fr 1fr;
+    main { padding: 20px; }
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 16px;
+    }
+
+    header nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 }
 
 @media (max-width: 480px) {
-    .place-info {
-        grid-template-columns: 1fr;
+    #places-list { grid-template-columns: 1fr; }
+
+    header nav a {
+        padding: 8px 16px;
+        font-size: 14px;
     }
 
-    nav {
-        gap: 0.75rem;
+    .login-button {
+        padding: 8px 20px;
+        font-size: 14px;
     }
 }

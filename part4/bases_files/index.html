@@ -3,33 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HBnB - Find Your Place</title>
+    <title>HBnB - List of Places</title>
+    <link rel="icon" type="image/svg+xml" href="images/icon.svg">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="images/icon.svg" type="image/svg+xml">
 </head>
 <body>
     <header>
-        <img src="images/logo.svg" alt="HBnB Logo" class="logo">
+        <img src="images/logo.png" alt="HBnB Logo" class="logo">
         <nav>
-            <a href="index.html">Home</a>
-            <a href="login.html" class="login-button" id="login-link">Login</a>
+            <a href="index.html">Places</a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
+            <span id="user-info" style="display: none;">
+                <span id="user-name"></span>
+                <a href="#" id="logout-link" class="login-button">Logout</a>
+            </span>
         </nav>
     </header>
 
     <main>
-        <section class="filter-section">
-            <label for="price-filter">Filter by max price per night:</label>
+        <section id="filter">
+            <label for="price-filter">Max Price per night:</label>
             <select id="price-filter">
-                <option value="10">10</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
                 <option value="all">All</option>
+                <option value="50">Under $50</option>
+                <option value="100">Under $100</option>
+                <option value="200">Under $200</option>
             </select>
         </section>
 
-        <div id="places-list">
-            <p class="loading">Loading places...</p>
-        </div>
+        <section id="places-list">
+            <!-- List of places will be populated dynamically -->
+        </section>
     </main>
 
     <footer>
