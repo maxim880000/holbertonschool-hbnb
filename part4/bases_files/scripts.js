@@ -3,7 +3,7 @@
    ES6 - Fetch API - JWT via Cookies
    ========================================= */
 
-const API_URL = '';
+const API_URL = 'http://localhost:5000';
 
 /* =========================================
    Cookie utilities
